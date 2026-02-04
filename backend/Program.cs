@@ -99,4 +99,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Health check endpoint
+app.MapGet("/", () => "API is running!");
+app.MapGet("/health", () => new { status = "healthy", timestamp = DateTime.UtcNow });
+
 app.Run();
