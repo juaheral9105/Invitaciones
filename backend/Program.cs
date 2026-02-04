@@ -5,13 +5,9 @@ using InvitacionesAPI.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Use InMemory database for testing without PostgreSQL
+// Use PostgreSQL database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseInMemoryDatabase("InvitacionesDB"));
-
-// To use PostgreSQL instead, uncomment this and comment the line above:
-// builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ExcelParserService>();
@@ -22,7 +18,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     });
 
-// Add CORS - Allow all local development ports
+// Add CORS - Allow localhost and Vercel domains
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -38,6 +34,18 @@ builder.Services.AddCors(options =>
                 "https://localhost:5175",
                 "https://localhost:3000"
             )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+        });
+
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.SetIsOriginAllowed(origin =>
+                origin.StartsWith("http://localhost") ||
+                origin.StartsWith("https://localhost") ||
+                origin.Contains(".vercel.app"))
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -62,7 +70,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowFrontend");
+// Use AllowAll policy to support Vercel deployments
+app.UseCors("AllowAll");
 
 // Serve static files from wwwroot
 app.UseStaticFiles();
