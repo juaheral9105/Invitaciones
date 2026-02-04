@@ -125,20 +125,34 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Run database migrations automatically on startup
+Console.WriteLine("=== STARTING DATABASE MIGRATIONS ===");
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
+        Console.WriteLine("Getting pending migrations...");
+        var pendingMigrations = context.Database.GetPendingMigrations().ToList();
+        Console.WriteLine($"Pending migrations count: {pendingMigrations.Count}");
+        foreach (var migration in pendingMigrations)
+        {
+            Console.WriteLine($"  - {migration}");
+        }
+
+        Console.WriteLine("Applying migrations...");
         context.Database.Migrate();
+        Console.WriteLine("Migrations applied successfully!");
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while migrating the database.");
+        Console.WriteLine($"Migration error: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
     }
 }
+Console.WriteLine("=== DATABASE MIGRATIONS COMPLETED ===");
 
 // Create wwwroot/uploads directories if they don't exist
 var uploadsPath = Path.Combine(app.Environment.WebRootPath ?? "wwwroot", "uploads");
