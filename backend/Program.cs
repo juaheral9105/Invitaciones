@@ -6,8 +6,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Use PostgreSQL database
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"=== CONNECTION STRING DEBUG ===");
+Console.WriteLine($"Connection string is null: {connectionString == null}");
+Console.WriteLine($"Connection string is empty: {string.IsNullOrEmpty(connectionString)}");
+if (!string.IsNullOrEmpty(connectionString))
+{
+    // Print without password for security
+    var sanitized = connectionString.Contains("Password=")
+        ? connectionString.Substring(0, connectionString.IndexOf("Password=")) + "Password=****"
+        : connectionString;
+    Console.WriteLine($"Connection string: {sanitized}");
+}
+Console.WriteLine($"==============================");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ExcelParserService>();
