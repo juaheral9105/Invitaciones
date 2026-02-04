@@ -1,0 +1,47 @@
+# Frontend (Vue.js)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# Backend (.NET)
+backend/bin/
+backend/obj/
+backend/wwwroot/uploads/
+backend/*.user
+backend/.vs/
+backend/.vscode/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+appsettings.Development.json
+
+# Build
+build/
+dist/
+out/
