@@ -5,67 +5,25 @@ using InvitacionesAPI.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Use PostgreSQL database
-Console.WriteLine($"=== CONNECTION STRING DEBUG ===");
-Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
-
-// Try multiple ways to get connection string
+// Use PostgreSQL database - Get connection string from environment variables or config
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-Console.WriteLine($"GetConnectionString result is null: {connectionString == null}");
 
-// Try reading directly from environment variable
-var envConnString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
-Console.WriteLine($"Environment variable 'ConnectionStrings__DefaultConnection' is null: {envConnString == null}");
-
-// Try Railway's DATABASE_PUBLIC_URL or DATABASE_URL
+// Try Railway's DATABASE_PUBLIC_URL or DATABASE_URL if not found in config
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL")
                   ?? Environment.GetEnvironmentVariable("DATABASE_URL");
-Console.WriteLine($"DATABASE_URL/DATABASE_PUBLIC_URL is null: {databaseUrl == null}");
-Console.WriteLine($"DATABASE_URL value (first 30 chars): {(databaseUrl != null ? databaseUrl.Substring(0, Math.Min(30, databaseUrl.Length)) : "null")}");
 
-if (!string.IsNullOrEmpty(databaseUrl))
+if (!string.IsNullOrEmpty(databaseUrl) && (databaseUrl.StartsWith("postgres://") || databaseUrl.StartsWith("postgresql://")))
 {
-    Console.WriteLine($"DATABASE_URL starts with 'postgres://': {databaseUrl.StartsWith("postgres://")}");
-    Console.WriteLine($"DATABASE_URL starts with 'postgresql://': {databaseUrl.StartsWith("postgresql://")}");
-
-    if (databaseUrl.StartsWith("postgres://") || databaseUrl.StartsWith("postgresql://"))
-    {
-        try
-        {
-            // Convert PostgreSQL URL format to .NET connection string format
-            // Format: postgres://user:password@host:port/database or postgresql://...
-            var uri = new Uri(databaseUrl);
-            var userInfo = uri.UserInfo.Split(':');
-            connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
-            Console.WriteLine("Successfully converted DATABASE_URL to connection string");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error converting DATABASE_URL: {ex.Message}");
-        }
-    }
+    // Convert PostgreSQL URL format to .NET connection string format
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
 }
-else if (!string.IsNullOrEmpty(envConnString))
+else if (string.IsNullOrEmpty(connectionString))
 {
-    connectionString = envConnString;
-    Console.WriteLine("Using ConnectionStrings__DefaultConnection");
+    // Try ConnectionStrings__DefaultConnection environment variable
+    connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
 }
-
-Console.WriteLine($"Final connection string is null: {connectionString == null}");
-Console.WriteLine($"Final connection string is empty: {string.IsNullOrEmpty(connectionString)}");
-if (!string.IsNullOrEmpty(connectionString))
-{
-    // Print without password for security
-    var sanitized = connectionString.Contains("Password=")
-        ? connectionString.Substring(0, connectionString.IndexOf("Password=")) + "Password=****"
-        : connectionString;
-    Console.WriteLine($"Connection string: {sanitized}");
-}
-else
-{
-    Console.WriteLine("WARNING: No connection string found!");
-}
-Console.WriteLine($"==============================");
 
 if (string.IsNullOrEmpty(connectionString))
 {
@@ -124,33 +82,21 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Create database and tables automatically on startup
-Console.WriteLine("=== STARTING DATABASE CREATION ===");
+// Ensure database and tables exist on startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-
-        // Delete and recreate database to ensure clean state
-        Console.WriteLine("Deleting existing database...");
-        context.Database.EnsureDeleted();
-        Console.WriteLine("Database deleted.");
-
-        Console.WriteLine("Creating database and tables...");
         context.Database.EnsureCreated();
-        Console.WriteLine("Database and tables created successfully!");
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while creating the database.");
-        Console.WriteLine($"Database creation error: {ex.Message}");
-        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        logger.LogError(ex, "An error occurred while ensuring the database exists.");
     }
 }
-Console.WriteLine("=== DATABASE CREATION COMPLETED ===");
 
 // Create wwwroot/uploads directories if they don't exist
 var uploadsPath = Path.Combine(app.Environment.WebRootPath ?? "wwwroot", "uploads");
