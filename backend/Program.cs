@@ -17,8 +17,25 @@ Console.WriteLine($"GetConnectionString result is null: {connectionString == nul
 var envConnString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
 Console.WriteLine($"Environment variable 'ConnectionStrings__DefaultConnection' is null: {envConnString == null}");
 
-// Use environment variable if available, otherwise use config
-connectionString = envConnString ?? connectionString;
+// Try Railway's DATABASE_PUBLIC_URL or DATABASE_URL
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL")
+                  ?? Environment.GetEnvironmentVariable("DATABASE_URL");
+Console.WriteLine($"DATABASE_URL/DATABASE_PUBLIC_URL is null: {databaseUrl == null}");
+
+if (!string.IsNullOrEmpty(databaseUrl) && databaseUrl.StartsWith("postgres://"))
+{
+    // Convert PostgreSQL URL format to .NET connection string format
+    // Format: postgres://user:password@host:port/database
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+    Console.WriteLine("Using DATABASE_URL converted to connection string");
+}
+else if (!string.IsNullOrEmpty(envConnString))
+{
+    connectionString = envConnString;
+    Console.WriteLine("Using ConnectionStrings__DefaultConnection");
+}
 
 Console.WriteLine($"Final connection string is null: {connectionString == null}");
 Console.WriteLine($"Final connection string is empty: {string.IsNullOrEmpty(connectionString)}");
@@ -38,7 +55,7 @@ Console.WriteLine($"==============================");
 
 if (string.IsNullOrEmpty(connectionString))
 {
-    throw new InvalidOperationException("Database connection string is not configured. Please set the ConnectionStrings__DefaultConnection environment variable.");
+    throw new InvalidOperationException("Database connection string is not configured. Please set DATABASE_URL, DATABASE_PUBLIC_URL, or ConnectionStrings__DefaultConnection environment variable.");
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
