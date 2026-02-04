@@ -16,9 +16,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build /app/backend/out .
 
-# Exponer puerto por defecto (Railway lo sobreescribirá)
+# Exponer puerto por defecto
 EXPOSE 8080
 
-# El puerto se configura mediante la variable de entorno ASPNETCORE_URLS
-# Railway la establecerá automáticamente
-ENTRYPOINT ["dotnet", "InvitacionesAPI.dll"]
+# Usar shell form para permitir expansión de variables de entorno
+# Railway asignará el puerto mediante $PORT
+CMD ASPNETCORE_URLS=http://*:${PORT:-8080} dotnet InvitacionesAPI.dll
