@@ -132,6 +132,12 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
+
+        // Delete and recreate database to ensure clean state
+        Console.WriteLine("Deleting existing database...");
+        context.Database.EnsureDeleted();
+        Console.WriteLine("Database deleted.");
+
         Console.WriteLine("Creating database and tables...");
         context.Database.EnsureCreated();
         Console.WriteLine("Database and tables created successfully!");
