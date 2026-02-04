@@ -21,15 +21,29 @@ Console.WriteLine($"Environment variable 'ConnectionStrings__DefaultConnection' 
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL")
                   ?? Environment.GetEnvironmentVariable("DATABASE_URL");
 Console.WriteLine($"DATABASE_URL/DATABASE_PUBLIC_URL is null: {databaseUrl == null}");
+Console.WriteLine($"DATABASE_URL value (first 30 chars): {(databaseUrl != null ? databaseUrl.Substring(0, Math.Min(30, databaseUrl.Length)) : "null")}");
 
-if (!string.IsNullOrEmpty(databaseUrl) && databaseUrl.StartsWith("postgres://"))
+if (!string.IsNullOrEmpty(databaseUrl))
 {
-    // Convert PostgreSQL URL format to .NET connection string format
-    // Format: postgres://user:password@host:port/database
-    var uri = new Uri(databaseUrl);
-    var userInfo = uri.UserInfo.Split(':');
-    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
-    Console.WriteLine("Using DATABASE_URL converted to connection string");
+    Console.WriteLine($"DATABASE_URL starts with 'postgres://': {databaseUrl.StartsWith("postgres://")}");
+    Console.WriteLine($"DATABASE_URL starts with 'postgresql://': {databaseUrl.StartsWith("postgresql://")}");
+
+    if (databaseUrl.StartsWith("postgres://") || databaseUrl.StartsWith("postgresql://"))
+    {
+        try
+        {
+            // Convert PostgreSQL URL format to .NET connection string format
+            // Format: postgres://user:password@host:port/database or postgresql://...
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+            Console.WriteLine("Successfully converted DATABASE_URL to connection string");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error converting DATABASE_URL: {ex.Message}");
+        }
+    }
 }
 else if (!string.IsNullOrEmpty(envConnString))
 {
