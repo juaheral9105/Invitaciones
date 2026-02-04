@@ -6,10 +6,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Use PostgreSQL database
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 Console.WriteLine($"=== CONNECTION STRING DEBUG ===");
-Console.WriteLine($"Connection string is null: {connectionString == null}");
-Console.WriteLine($"Connection string is empty: {string.IsNullOrEmpty(connectionString)}");
+Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
+
+// Try multiple ways to get connection string
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"GetConnectionString result is null: {connectionString == null}");
+
+// Try reading directly from environment variable
+var envConnString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+Console.WriteLine($"Environment variable 'ConnectionStrings__DefaultConnection' is null: {envConnString == null}");
+
+// Use environment variable if available, otherwise use config
+connectionString = envConnString ?? connectionString;
+
+Console.WriteLine($"Final connection string is null: {connectionString == null}");
+Console.WriteLine($"Final connection string is empty: {string.IsNullOrEmpty(connectionString)}");
 if (!string.IsNullOrEmpty(connectionString))
 {
     // Print without password for security
@@ -18,7 +30,16 @@ if (!string.IsNullOrEmpty(connectionString))
         : connectionString;
     Console.WriteLine($"Connection string: {sanitized}");
 }
+else
+{
+    Console.WriteLine("WARNING: No connection string found!");
+}
 Console.WriteLine($"==============================");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Database connection string is not configured. Please set the ConnectionStrings__DefaultConnection environment variable.");
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
