@@ -15,10 +15,13 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build /app/backend/out .
+COPY --from=build /app/backend/start.sh .
+
+# Dar permisos de ejecución al script
+RUN chmod +x start.sh
 
 # Exponer puerto por defecto
 EXPOSE 8080
 
-# Usar shell form para permitir expansión de variables de entorno
-# Railway asignará el puerto mediante $PORT
-CMD ASPNETCORE_URLS=http://*:${PORT:-8080} dotnet InvitacionesAPI.dll
+# Usar el script de inicio que lee la variable PORT
+CMD ["./start.sh"]
