@@ -1,5 +1,5 @@
-# Use .NET 6 SDK for build
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+# Use .NET 7 SDK for build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
 
 # Copy backend project files
@@ -14,7 +14,7 @@ WORKDIR /app/backend
 RUN dotnet publish -c Release -o out
 
 # Runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
+FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
 COPY --from=build /app/backend/out .
 
