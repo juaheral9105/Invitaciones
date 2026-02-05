@@ -199,14 +199,15 @@ const loadFromLocalStorage = () => {
 }
 
 // Auto-guardado con debounce (espera 2 segundos después del último cambio)
-watch(() => store.invitation, () => {
-  if (autoSaveTimer.value) {
-    clearTimeout(autoSaveTimer.value)
-  }
-  autoSaveTimer.value = setTimeout(() => {
-    saveToLocalStorage()
-  }, 2000)
-}, { deep: true })
+// DESHABILITADO: Ya no guardamos automáticamente en localStorage
+// watch(() => store.invitation, () => {
+//   if (autoSaveTimer.value) {
+//     clearTimeout(autoSaveTimer.value)
+//   }
+//   autoSaveTimer.value = setTimeout(() => {
+//     saveToLocalStorage()
+//   }, 2000)
+// }, { deep: true })
 
 onMounted(async () => {
   const id = route.params.id
@@ -224,15 +225,15 @@ onMounted(async () => {
       showMessage('Error al cargar la invitación', 'error')
     }
   } else {
-    // Intentar cargar borrador guardado
-    const draft = loadFromLocalStorage()
-    if (draft) {
-      const shouldLoad = confirm('Se encontró un borrador guardado. ¿Deseas cargarlo?')
-      if (shouldLoad) {
-        store.setInvitation(draft)
-        showMessage('Borrador cargado exitosamente', 'success')
-      }
-    }
+    // DESHABILITADO: Ya no cargamos automáticamente desde localStorage
+    // const draft = loadFromLocalStorage()
+    // if (draft) {
+    //   const shouldLoad = confirm('Se encontró un borrador guardado. ¿Deseas cargarlo?')
+    //   if (shouldLoad) {
+    //     store.setInvitation(draft)
+    //     showMessage('Borrador cargado exitosamente', 'success')
+    //   }
+    // }
   }
 })
 
@@ -353,7 +354,7 @@ const importDraft = () => {
         const data = JSON.parse(event.target.result)
         if (data.invitation) {
           store.setInvitation(data.invitation)
-          saveToLocalStorage()
+          // saveToLocalStorage() // DESHABILITADO
           showMessage('✅ Borrador importado exitosamente', 'success')
         } else {
           showMessage('❌ Archivo inválido', 'error')
