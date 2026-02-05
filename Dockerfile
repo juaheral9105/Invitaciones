@@ -1,4 +1,4 @@
-# Use .NET 7 SDK for build
+# Use .NET 7 SDK for build (updated)
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
 
