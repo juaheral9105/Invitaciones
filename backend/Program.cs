@@ -89,8 +89,6 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        // Temporarily delete and recreate to add StoredFiles table
-        context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
     }
     catch (Exception ex)
