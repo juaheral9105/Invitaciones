@@ -124,7 +124,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Health check endpoint
-app.MapGet("/", () => "API is running! v2");
-app.MapGet("/health", () => new { status = "healthy", timestamp = DateTime.UtcNow });
+app.MapGet("/", () => "API is running! v3 - Database storage enabled");
+app.MapGet("/health", () => new { status = "healthy", timestamp = DateTime.UtcNow, version = "3.0" });
 
 app.Run();
