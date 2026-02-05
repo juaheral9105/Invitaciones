@@ -77,7 +77,11 @@ namespace InvitacionesAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = $"Error al procesar el archivo: {ex.Message}" });
+                var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                Console.WriteLine($"Error uploading Excel: {ex.Message}");
+                Console.WriteLine($"Inner exception: {innerMessage}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return BadRequest(new { message = $"Error al procesar el archivo: {innerMessage}" });
             }
         }
 

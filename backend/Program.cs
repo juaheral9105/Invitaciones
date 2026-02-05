@@ -94,7 +94,7 @@ using (var scope = app.Services.CreateScope())
         // Try to create the database if it doesn't exist
         context.Database.EnsureCreated();
 
-        // Execute raw SQL to create StoredFiles table if it doesn't exist
+        // Execute raw SQL to create tables if they don't exist
         try
         {
             var sql = @"
@@ -109,13 +109,29 @@ using (var scope = app.Services.CreateScope())
                 );
                 CREATE INDEX IF NOT EXISTS ""IX_StoredFiles_UploadedAt"" ON ""StoredFiles"" (""UploadedAt"");
                 CREATE INDEX IF NOT EXISTS ""IX_StoredFiles_FileType"" ON ""StoredFiles"" (""FileType"");
+
+                CREATE TABLE IF NOT EXISTS ""GuestList"" (
+                    ""Id"" serial PRIMARY KEY,
+                    ""InvitationId"" uuid NOT NULL,
+                    ""Name"" text NOT NULL,
+                    ""Phone"" text NOT NULL,
+                    ""NumberOfGuests"" integer NOT NULL,
+                    ""GuestNames"" text,
+                    ""EventHasAccommodation"" boolean NOT NULL DEFAULT false,
+                    ""AccommodationAllowed"" boolean NOT NULL DEFAULT false,
+                    ""CreatedAt"" timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    ""UpdatedAt"" timestamp with time zone
+                );
+                CREATE INDEX IF NOT EXISTS ""IX_GuestList_Phone"" ON ""GuestList"" (""Phone"");
+                CREATE INDEX IF NOT EXISTS ""IX_GuestList_InvitationId"" ON ""GuestList"" (""InvitationId"");
+                CREATE UNIQUE INDEX IF NOT EXISTS ""IX_GuestList_InvitationId_Phone"" ON ""GuestList"" (""InvitationId"", ""Phone"");
             ";
             context.Database.ExecuteSqlRaw(sql);
-            logger.LogInformation("StoredFiles table created or already exists.");
+            logger.LogInformation("Database tables created or already exist.");
         }
         catch (Exception ex2)
         {
-            logger.LogError(ex2, "Error creating StoredFiles table.");
+            logger.LogError(ex2, "Error creating database tables: {Message}", ex2.Message);
         }
     }
     catch (Exception ex)
