@@ -36,6 +36,12 @@ const API_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http:
 const getImageUrl = (url) => {
   if (!url) return ''
   if (url.startsWith('http')) return url
+  // Handle old format URLs from local development (/uploads/images/...)
+  // These should not work in production since Railway uses ephemeral storage
+  if (url.startsWith('/uploads/')) {
+    console.warn('Old image URL format detected:', url, '- Images uploaded to local storage will not work in production')
+    return `${API_BASE_URL}${url}`
+  }
   return `${API_BASE_URL}${url}`
 }
 </script>

@@ -1137,6 +1137,7 @@ const uploadImage = async (event) => {
 
   try {
     const response = await invitationService.uploadImage(formData)
+    // Store only the relative URL returned by the backend
     selectedBlock.value.content.url = response.data.url
     updateBlockContent()
   } catch (error) {
