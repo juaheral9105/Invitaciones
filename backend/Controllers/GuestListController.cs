@@ -58,21 +58,38 @@ namespace InvitacionesAPI.Controllers
                 using var stream = file.OpenReadStream();
                 var guests = await _excelParser.ParseExcelFile(stream, invitationId);
 
+                // Remove duplicates based on phone number (keep first occurrence)
+                var uniqueGuests = guests
+                    .GroupBy(g => g.Phone)
+                    .Select(group => group.First())
+                    .ToList();
+
+                var duplicatesRemoved = guests.Count - uniqueGuests.Count;
+                if (duplicatesRemoved > 0)
+                {
+                    Console.WriteLine($"Removed {duplicatesRemoved} duplicate phone numbers from Excel");
+                }
+
                 // Remove existing guests for this invitation
                 var existingGuests = await _context.GuestList
                     .Where(g => g.InvitationId == invitationId)
                     .ToListAsync();
                 _context.GuestList.RemoveRange(existingGuests);
 
-                // Add new guests
-                await _context.GuestList.AddRangeAsync(guests);
+                // Add new guests (without duplicates)
+                await _context.GuestList.AddRangeAsync(uniqueGuests);
                 await _context.SaveChangesAsync();
+
+                var message = duplicatesRemoved > 0
+                    ? $"Lista de invitados cargada exitosamente. Se eliminaron {duplicatesRemoved} números duplicados."
+                    : "Lista de invitados cargada exitosamente";
 
                 return Ok(new
                 {
-                    message = "Lista de invitados cargada exitosamente",
-                    totalGuests = guests.Count,
-                    guests = guests
+                    message = message,
+                    totalGuests = uniqueGuests.Count,
+                    duplicatesRemoved = duplicatesRemoved,
+                    guests = uniqueGuests
                 });
             }
             catch (Exception ex)
