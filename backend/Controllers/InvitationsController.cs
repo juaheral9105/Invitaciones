@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using InvitacionesAPI.Data;
 using InvitacionesAPI.Models;
 using InvitacionesAPI.DTOs;
+using InvitacionesAPI.Services;
 using System.Text.Json;
 
 namespace InvitacionesAPI.Controllers
@@ -14,15 +15,18 @@ namespace InvitacionesAPI.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger<InvitationsController> _logger;
         private readonly IWebHostEnvironment _environment;
+        private readonly ICloudinaryService _cloudinaryService;
 
         public InvitationsController(
             ApplicationDbContext context,
             ILogger<InvitationsController> logger,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            ICloudinaryService cloudinaryService)
         {
             _context = context;
             _logger = logger;
             _environment = environment;
+            _cloudinaryService = cloudinaryService;
         }
 
         // GET: api/invitations
@@ -137,64 +141,40 @@ namespace InvitacionesAPI.Controllers
         [HttpPost("upload-image")]
         public async Task<ActionResult<string>> UploadImage(IFormFile file)
         {
-            if (file == null || file.Length == 0)
+            try
             {
-                return BadRequest("No file uploaded");
+                var imageUrl = await _cloudinaryService.UploadImageAsync(file);
+                return Ok(new { url = imageUrl });
             }
-
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-            if (!allowedExtensions.Contains(extension))
+            catch (ArgumentException ex)
             {
-                return BadRequest("Invalid file type");
+                return BadRequest(ex.Message);
             }
-
-            var uploadsFolder = Path.Combine(_environment.WebRootPath ?? "wwwroot", "uploads", "images");
-            Directory.CreateDirectory(uploadsFolder);
-
-            var fileName = $"{Guid.NewGuid()}{extension}";
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            catch (Exception ex)
             {
-                await file.CopyToAsync(stream);
+                _logger.LogError(ex, "Error uploading image");
+                return StatusCode(500, "Error uploading image");
             }
-
-            var fileUrl = $"/uploads/images/{fileName}";
-            return Ok(new { url = fileUrl });
         }
 
         // POST: api/invitations/upload-music
         [HttpPost("upload-music")]
         public async Task<ActionResult<string>> UploadMusic(IFormFile file)
         {
-            if (file == null || file.Length == 0)
+            try
             {
-                return BadRequest("No file uploaded");
+                var musicUrl = await _cloudinaryService.UploadMusicAsync(file);
+                return Ok(new { url = musicUrl });
             }
-
-            var allowedExtensions = new[] { ".mp3", ".wav", ".ogg" };
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-            if (!allowedExtensions.Contains(extension))
+            catch (ArgumentException ex)
             {
-                return BadRequest("Invalid file type");
+                return BadRequest(ex.Message);
             }
-
-            var uploadsFolder = Path.Combine(_environment.WebRootPath ?? "wwwroot", "uploads", "music");
-            Directory.CreateDirectory(uploadsFolder);
-
-            var fileName = $"{Guid.NewGuid()}{extension}";
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            catch (Exception ex)
             {
-                await file.CopyToAsync(stream);
+                _logger.LogError(ex, "Error uploading music");
+                return StatusCode(500, "Error uploading music");
             }
-
-            var fileUrl = $"/uploads/music/{fileName}";
-            return Ok(new { url = fileUrl });
         }
 
         private static InvitationDto MapToDto(Invitation invitation)
