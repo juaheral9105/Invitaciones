@@ -93,7 +93,8 @@
           />
           <p v-if="uploadingGuestList" class="text-xs text-blue-600 mt-1">⏳ {{ guestListSuccess || 'Procesando archivo...' }}</p>
           <p v-else-if="guestListError" class="text-xs text-red-600 mt-1">❌ {{ guestListError }}</p>
-          <p v-else-if="guestListSuccess" class="text-xs text-green-600 mt-1">✓ {{ guestListSuccess }}</p>
+          <p v-else-if="guestListSuccess && !uploadingGuestList" class="text-xs text-green-600 mt-1">✓ {{ guestListSuccess }}</p>
+          <p v-else-if="guestCount > 0" class="text-xs text-green-600 mt-1">✓ {{ guestCount }} invitados cargados</p>
           <p v-else class="text-xs text-gray-500 mt-1">No necesitas guardar primero • .xlsx o .xls</p>
         </div>
 
