@@ -118,20 +118,29 @@ namespace InvitacionesAPI.Controllers
                 }
                 _logger.LogInformation("==========================");
 
-                await _emailService.SendFormConfirmationEmailAsync(
-                    request.ToEmail,
-                    request.Phone,
-                    request.FormData
-                );
+                try
+                {
+                    await _emailService.SendFormConfirmationEmailAsync(
+                        request.ToEmail,
+                        request.Phone,
+                        request.FormData
+                    );
 
-                _logger.LogInformation($"Confirmation email sent to {request.ToEmail} for phone {request.Phone}");
+                    _logger.LogInformation($"Confirmation email sent to {request.ToEmail} for phone {request.Phone}");
 
-                return Ok(new { success = true, message = "Email enviado correctamente" });
+                    return Ok(new { success = true, message = "Email enviado correctamente" });
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogError(emailEx, "Error sending email, but confirmation was saved");
+                    // Return success even if email fails - the confirmation was saved
+                    return Ok(new { success = true, message = "Confirmación guardada (email no configurado)", warning = "El email no pudo ser enviado pero la confirmación fue guardada." });
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending confirmation email");
-                return StatusCode(500, new { error = "Error al enviar el email", details = ex.Message });
+                _logger.LogError(ex, "Error processing confirmation");
+                return StatusCode(500, new { error = "Error al procesar la confirmación", details = ex.Message });
             }
         }
     }
