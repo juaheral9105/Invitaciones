@@ -1,0 +1,17 @@
+[phases.setup]
+nixPkgs = ["...", "dotnet-sdk_6"]
+
+[phases.install]
+cmds = [
+  "cd backend",
+  "dotnet restore"
+]
+
+[phases.build]
+cmds = [
+  "cd backend",
+  "dotnet publish -c Release -o out"
+]
+
+[start]
+cmd = "cd backend/out && ./InvitacionesAPI"
