@@ -89,7 +89,34 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
+        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        // Try to create the database if it doesn't exist
         context.Database.EnsureCreated();
+
+        // Execute raw SQL to create StoredFiles table if it doesn't exist
+        try
+        {
+            var sql = @"
+                CREATE TABLE IF NOT EXISTS ""StoredFiles"" (
+                    ""Id"" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+                    ""FileName"" text NOT NULL,
+                    ""ContentType"" text NOT NULL,
+                    ""Data"" bytea NOT NULL,
+                    ""Size"" bigint NOT NULL,
+                    ""UploadedAt"" timestamp with time zone NOT NULL,
+                    ""FileType"" text NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS ""IX_StoredFiles_UploadedAt"" ON ""StoredFiles"" (""UploadedAt"");
+                CREATE INDEX IF NOT EXISTS ""IX_StoredFiles_FileType"" ON ""StoredFiles"" (""FileType"");
+            ";
+            context.Database.ExecuteSqlRaw(sql);
+            logger.LogInformation("StoredFiles table created or already exists.");
+        }
+        catch (Exception ex2)
+        {
+            logger.LogError(ex2, "Error creating StoredFiles table.");
+        }
     }
     catch (Exception ex)
     {
