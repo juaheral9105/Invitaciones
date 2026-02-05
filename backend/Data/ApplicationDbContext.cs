@@ -13,6 +13,7 @@ namespace InvitacionesAPI.Data
         public DbSet<Invitation> Invitations { get; set; }
         public DbSet<Confirmation> Confirmations { get; set; }
         public DbSet<GuestListItem> GuestList { get; set; }
+        public DbSet<StoredFile> StoredFiles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -55,6 +56,15 @@ namespace InvitacionesAPI.Data
                 entity.HasIndex(e => new { e.InvitationId, e.Phone }).IsUnique();
                 entity.HasIndex(e => e.Phone);
                 entity.HasIndex(e => e.InvitationId);
+            });
+
+            // Configure StoredFile
+            modelBuilder.Entity<StoredFile>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+                entity.HasIndex(e => e.UploadedAt);
+                entity.HasIndex(e => e.FileType);
             });
         }
     }

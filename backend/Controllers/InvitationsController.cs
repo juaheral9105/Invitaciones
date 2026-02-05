@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using InvitacionesAPI.Data;
 using InvitacionesAPI.Models;
 using InvitacionesAPI.DTOs;
-using InvitacionesAPI.Services;
 using System.Text.Json;
 
 namespace InvitacionesAPI.Controllers
@@ -14,19 +13,13 @@ namespace InvitacionesAPI.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<InvitationsController> _logger;
-        private readonly IWebHostEnvironment _environment;
-        private readonly ICloudinaryService _cloudinaryService;
 
         public InvitationsController(
             ApplicationDbContext context,
-            ILogger<InvitationsController> logger,
-            IWebHostEnvironment environment,
-            ICloudinaryService cloudinaryService)
+            ILogger<InvitationsController> logger)
         {
             _context = context;
             _logger = logger;
-            _environment = environment;
-            _cloudinaryService = cloudinaryService;
         }
 
         // GET: api/invitations
@@ -141,14 +134,39 @@ namespace InvitacionesAPI.Controllers
         [HttpPost("upload-image")]
         public async Task<ActionResult<string>> UploadImage(IFormFile file)
         {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded");
+            }
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                return BadRequest("Invalid file type");
+            }
+
             try
             {
-                var imageUrl = await _cloudinaryService.UploadImageAsync(file);
-                return Ok(new { url = imageUrl });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
+                using var memoryStream = new MemoryStream();
+                await file.CopyToAsync(memoryStream);
+
+                var storedFile = new StoredFile
+                {
+                    FileName = file.FileName,
+                    ContentType = file.ContentType,
+                    Data = memoryStream.ToArray(),
+                    Size = file.Length,
+                    UploadedAt = DateTime.UtcNow,
+                    FileType = "image"
+                };
+
+                _context.StoredFiles.Add(storedFile);
+                await _context.SaveChangesAsync();
+
+                var fileUrl = $"/api/invitations/files/{storedFile.Id}";
+                return Ok(new { url = fileUrl });
             }
             catch (Exception ex)
             {
@@ -161,20 +179,59 @@ namespace InvitacionesAPI.Controllers
         [HttpPost("upload-music")]
         public async Task<ActionResult<string>> UploadMusic(IFormFile file)
         {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded");
+            }
+
+            var allowedExtensions = new[] { ".mp3", ".wav", ".ogg" };
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                return BadRequest("Invalid file type");
+            }
+
             try
             {
-                var musicUrl = await _cloudinaryService.UploadMusicAsync(file);
-                return Ok(new { url = musicUrl });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
+                using var memoryStream = new MemoryStream();
+                await file.CopyToAsync(memoryStream);
+
+                var storedFile = new StoredFile
+                {
+                    FileName = file.FileName,
+                    ContentType = file.ContentType,
+                    Data = memoryStream.ToArray(),
+                    Size = file.Length,
+                    UploadedAt = DateTime.UtcNow,
+                    FileType = "music"
+                };
+
+                _context.StoredFiles.Add(storedFile);
+                await _context.SaveChangesAsync();
+
+                var fileUrl = $"/api/invitations/files/{storedFile.Id}";
+                return Ok(new { url = fileUrl });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error uploading music");
                 return StatusCode(500, "Error uploading music");
             }
+        }
+
+        // GET: api/invitations/files/{id}
+        [HttpGet("files/{id}")]
+        public async Task<IActionResult> GetFile(Guid id)
+        {
+            var file = await _context.StoredFiles.FindAsync(id);
+
+            if (file == null)
+            {
+                return NotFound();
+            }
+
+            return File(file.Data, file.ContentType, file.FileName);
         }
 
         private static InvitationDto MapToDto(Invitation invitation)
