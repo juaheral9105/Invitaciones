@@ -284,17 +284,29 @@ const convertSectionsToBlocks = (sections) => {
 const saveInvitation = async () => {
   saving.value = true
   try {
+    // Only send fields that backend expects (InvitationDto)
     const data = {
       title: store.invitation.title || 'Invitación sin título',
-      ...store.invitation,
+      subtitle: store.invitation.subtitle,
+      celebrantName: store.invitation.celebrantName,
+      eventDate: store.invitation.eventDate,
+      eventTime: store.invitation.eventTime,
+      venue: store.invitation.venue,
+      address: store.invitation.address,
+      locationLat: store.invitation.locationLat,
+      locationLng: store.invitation.locationLng,
+      backgroundColor: store.invitation.backgroundColor,
+      backgroundImage: store.invitation.backgroundImage,
+      textColor: store.invitation.textColor,
+      fontFamily: store.invitation.fontFamily,
+      musicUrl: store.invitation.musicUrl,
+      formEmail: store.invitation.formEmail,
       // Send blocks as sections for backend compatibility
-      sections: store.invitation.blocks,
-      // Remove blocks from the data object to avoid sending it
-      blocks: undefined
+      sections: store.invitation.blocks
     }
 
-    if (data.id) {
-      await invitationService.update(data.id, data)
+    if (store.invitation.id) {
+      await invitationService.update(store.invitation.id, data)
       showMessage('✅ Invitación actualizada exitosamente', 'success')
     } else {
       const response = await invitationService.create(data)
