@@ -94,6 +94,11 @@ onMounted(async () => {
   try {
     const response = await invitationService.getById(route.params.id)
     invitation.value = response.data
+
+    // Start music automatically if music URL is configured
+    if (invitation.value.musicUrl) {
+      shouldPlayMusic.value = true
+    }
   } catch (err) {
     console.error('Error loading invitation:', err)
     error.value = true
