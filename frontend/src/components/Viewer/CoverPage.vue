@@ -1,6 +1,7 @@
 <template>
   <div
-    class="fixed inset-0 w-full h-screen flex items-center justify-center overflow-hidden transition-opacity duration-1000 z-50"
+    @click="handleInteraction"
+    class="fixed inset-0 w-full h-screen flex items-center justify-center overflow-hidden transition-opacity duration-1000 z-50 cursor-pointer"
     :class="{ 'opacity-0 pointer-events-none': !visible }"
     :style="{
       backgroundColor: backgroundColor,
@@ -14,6 +15,13 @@
 
     <!-- Contenido de la portada -->
     <div class="relative z-10 text-center px-6 animate-fade-in max-w-4xl">
+      <!-- Music hint (only shows if music not started) -->
+      <div v-if="!musicStarted" class="absolute top-8 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-10 backdrop-blur-sm px-6 py-3 rounded-full animate-pulse">
+        <p class="text-sm font-medium" :style="{ color: textColor || '#ffffff' }">
+          🎵 Haz clic para comenzar
+        </p>
+      </div>
+
       <!-- Nombre de la homenajeada -->
       <h1
         class="font-bold mb-12 animate-slide-up"
@@ -45,7 +53,7 @@
 
       <!-- Indicador de scroll opcional -->
       <div class="mt-16 animate-bounce">
-        <svg class="w-4 h-4 mx-auto opacity-60" fill="none" stroke="currentColor" :style="{ color: textColor || '#ffffff' }" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 mx-auto opacity-60" fill="none" stroke="currentColor" :style="{ color: textColor || '#ffffff' }" viewBox="0 0 0 0">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
         </svg>
       </div>
@@ -54,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 
 const props = defineProps({
   visible: {
@@ -103,7 +111,17 @@ const props = defineProps({
   }
 })
 
-defineEmits(['enter'])
+const emit = defineEmits(['enter', 'start-music'])
+
+const musicStarted = ref(false)
+
+const handleInteraction = () => {
+  // Start music on first interaction
+  if (!musicStarted.value) {
+    emit('start-music')
+    musicStarted.value = true
+  }
+}
 </script>
 
 <style scoped>

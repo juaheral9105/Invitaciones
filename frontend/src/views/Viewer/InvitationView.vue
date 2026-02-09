@@ -30,6 +30,7 @@
       :name-font-size="invitation.coverNameFontSize"
       :button-font-size="invitation.coverButtonFontSize"
       @enter="enterInvitation"
+      @start-music="startMusic"
     />
 
     <!-- Invitación completa -->
@@ -80,6 +81,13 @@ const getFullUrl = (url) => {
   return `${API_BASE_URL}${url}`
 }
 
+const startMusic = () => {
+  // Start music when user interacts with cover page
+  if (!shouldPlayMusic.value) {
+    shouldPlayMusic.value = true
+  }
+}
+
 const enterInvitation = () => {
   showCover.value = false
   shouldPlayMusic.value = true
@@ -94,11 +102,6 @@ onMounted(async () => {
   try {
     const response = await invitationService.getById(route.params.id)
     invitation.value = response.data
-
-    // Start music automatically if music URL is configured
-    if (invitation.value.musicUrl) {
-      shouldPlayMusic.value = true
-    }
   } catch (err) {
     console.error('Error loading invitation:', err)
     error.value = true
