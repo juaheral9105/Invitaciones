@@ -128,6 +128,55 @@ using (var scope = app.Services.CreateScope())
             ";
             context.Database.ExecuteSqlRaw(sql);
             logger.LogInformation("Database tables created or already exist.");
+
+            // Add cover page columns to Invitations table if they don't exist
+            try
+            {
+                var coverPageSql = @"
+                    DO $$
+                    BEGIN
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverEnabled') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverEnabled"" boolean NOT NULL DEFAULT true;
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverName') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverName"" character varying(200) NOT NULL DEFAULT 'Nombre de la Homenajeada';
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverButtonText') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverButtonText"" character varying(100) NOT NULL DEFAULT 'Ver Invitación';
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverBackgroundColor') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverBackgroundColor"" character varying(50) NOT NULL DEFAULT '#f3e5f5';
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverBackgroundImage') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverBackgroundImage"" character varying(500);
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverTextColor') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverTextColor"" character varying(50) NOT NULL DEFAULT '#ffffff';
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverButtonColor') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverButtonColor"" character varying(50) NOT NULL DEFAULT '#ffffff';
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverButtonTextColor') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverButtonTextColor"" character varying(50) NOT NULL DEFAULT '#000000';
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverFontFamily') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverFontFamily"" character varying(100) NOT NULL DEFAULT 'Playfair Display';
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverNameFontSize') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverNameFontSize"" character varying(50) NOT NULL DEFAULT '6rem';
+                        END IF;
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='Invitations' AND column_name='CoverButtonFontSize') THEN
+                            ALTER TABLE ""Invitations"" ADD COLUMN ""CoverButtonFontSize"" character varying(50) NOT NULL DEFAULT '1.125rem';
+                        END IF;
+                    END $$;
+                ";
+                context.Database.ExecuteSqlRaw(coverPageSql);
+                logger.LogInformation("Cover page columns added or already exist.");
+            }
+            catch (Exception ex3)
+            {
+                logger.LogError(ex3, "Error adding cover page columns: {Message}", ex3.Message);
+            }
         }
         catch (Exception ex2)
         {
