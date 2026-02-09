@@ -104,13 +104,16 @@ const getBlockStyles = (block) => {
   if (!block.style) return {}
 
   return {
-    backgroundColor: block.style.backgroundColor || 'transparent',
-    color: block.style.color || '#000000',
-    fontFamily: block.style.fontFamily || 'Montserrat',
-    fontSize: block.style.fontSize || '16px',
-    textAlign: block.style.textAlign || 'center',
-    padding: block.style.padding || '20px',
-    borderRadius: block.style.borderRadius || '8px'
+    backgroundColor: block.style.backgroundColor,
+    color: block.style.color,
+    fontFamily: block.style.fontFamily,
+    fontSize: block.style.fontSize,
+    textAlign: block.style.textAlign,
+    padding: block.style.padding,
+    borderRadius: block.style.borderRadius,
+    width: block.style.width || '100%',
+    height: block.style.height || 'auto',
+    display: 'block'
   }
 }
 </script>
