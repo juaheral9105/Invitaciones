@@ -1,53 +1,51 @@
 <template>
   <div
-    class="absolute inset-0 flex items-center justify-center overflow-hidden transition-opacity duration-1000"
+    class="fixed inset-0 w-full h-screen flex items-center justify-center overflow-hidden transition-opacity duration-1000 z-50"
     :class="{ 'opacity-0 pointer-events-none': !visible }"
     :style="{
       backgroundColor: backgroundColor,
       backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none',
       backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      width: '100%',
-      height: '100%'
+      backgroundPosition: 'center'
     }"
   >
     <!-- Overlay opcional para mejorar legibilidad -->
     <div class="absolute inset-0 bg-black opacity-20"></div>
 
     <!-- Contenido de la portada -->
-    <div class="relative z-10 text-center px-6 animate-fade-in">
+    <div class="relative z-10 text-center px-6 animate-fade-in max-w-4xl">
       <!-- Nombre de la homenajeada -->
       <h1
-        class="font-bold mb-8 animate-slide-up"
+        class="font-bold mb-12 animate-slide-up"
         :style="{
           fontFamily: fontFamily || 'Playfair Display',
           color: textColor || '#ffffff',
-          fontSize: nameFontSize || '6rem'
+          fontSize: nameFontSize || '4rem'
         }"
       >
         {{ coverName || 'Nombre' }}
       </h1>
 
       <!-- Línea decorativa -->
-      <div class="w-32 h-1 mx-auto mb-8 bg-white opacity-80"></div>
+      <div class="w-32 h-1 mx-auto mb-12 bg-white opacity-80"></div>
 
       <!-- Botón de entrada -->
       <button
         @click="$emit('enter')"
-        class="px-10 py-4 font-semibold rounded-full shadow-2xl transform transition-all duration-300 hover:scale-110 hover:shadow-3xl animate-bounce-slow"
+        class="px-12 py-5 text-xl font-semibold rounded-full shadow-2xl transform transition-all duration-300 hover:scale-110 hover:shadow-3xl animate-bounce-slow"
         :style="{
           backgroundColor: buttonColor || '#ffffff',
           color: buttonTextColor || '#000000',
           fontFamily: fontFamily || 'Montserrat',
-          fontSize: buttonFontSize || '1.125rem'
+          fontSize: buttonFontSize || '1.5rem'
         }"
       >
         {{ buttonText || 'Ver Invitación' }}
       </button>
 
       <!-- Indicador de scroll opcional -->
-      <div class="mt-12 animate-bounce">
-        <svg class="w-6 h-6 mx-auto opacity-70" fill="none" stroke="currentColor" :style="{ color: textColor || '#ffffff' }" viewBox="0 0 24 24">
+      <div class="mt-16 animate-bounce">
+        <svg class="w-4 h-4 mx-auto opacity-60" fill="none" stroke="currentColor" :style="{ color: textColor || '#ffffff' }" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
         </svg>
       </div>

@@ -83,9 +83,14 @@ const getFullUrl = (url) => {
 const enterInvitation = () => {
   showCover.value = false
   shouldPlayMusic.value = true
+  // Scroll to top when entering invitation
+  window.scrollTo(0, 0)
 }
 
 onMounted(async () => {
+  // Always scroll to top when page loads
+  window.scrollTo(0, 0)
+
   try {
     const response = await invitationService.getById(route.params.id)
     invitation.value = response.data
