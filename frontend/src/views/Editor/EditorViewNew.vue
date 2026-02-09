@@ -22,6 +22,13 @@
           </span>
 
           <button
+            @click="showLoadModal = true"
+            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            title="Cargar Invitación Guardada"
+          >
+            📥 Cargar Invitación
+          </button>
+          <button
             @click="exportDraft"
             class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
             title="Exportar borrador"
@@ -140,6 +147,13 @@
         </div>
       </div>
     </Transition>
+
+    <!-- Load Invitation Modal -->
+    <LoadInvitationModal
+      :show="showLoadModal"
+      @close="showLoadModal = false"
+      @load="handleLoadInvitation"
+    />
   </div>
 </template>
 
@@ -154,6 +168,7 @@ import PropertiesPanel from '../../components/Editor/PropertiesPanel.vue'
 import MusicPlayerFixed from '../../components/Common/MusicPlayerFixed.vue'
 import MusicPlayer from '../../components/Common/MusicPlayer.vue'
 import CoverPage from '../../components/Viewer/CoverPage.vue'
+import LoadInvitationModal from '../../components/Editor/LoadInvitationModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -167,6 +182,7 @@ const isEditing = ref(false)
 const autoSaveTimer = ref(null)
 const lastSaved = ref(null)
 const showCover = ref(true)
+const showLoadModal = ref(false)
 
 // Auto-guardado en localStorage
 const saveToLocalStorage = () => {
@@ -261,6 +277,7 @@ const saveInvitation = async () => {
   saving.value = true
   try {
     const data = {
+      title: store.invitation.title || 'Invitación sin título',
       ...store.invitation,
       // Convert blocks to JSON for backend
       blocksJson: JSON.stringify(store.invitation.blocks)
@@ -381,6 +398,28 @@ const clearDraft = () => {
 // Handle cover page transition
 const enterInvitation = () => {
   showCover.value = false
+}
+
+// Handle loading an invitation from the modal
+const handleLoadInvitation = async (invitationData) => {
+  try {
+    // Convert sections to blocks if needed (for backward compatibility)
+    if (invitationData.sections && !invitationData.blocks) {
+      invitationData.blocks = convertSectionsToBlocks(invitationData.sections)
+      delete invitationData.sections
+    }
+
+    // Set the invitation in the store
+    store.setInvitation(invitationData)
+
+    // Update URL to reflect loaded invitation
+    router.push({ name: 'EditorEdit', params: { id: invitationData.id } })
+
+    showMessage('✅ Invitación cargada exitosamente', 'success')
+  } catch (error) {
+    console.error('Error loading invitation:', error)
+    showMessage('❌ Error al cargar la invitación', 'error')
+  }
 }
 
 // Watch preview mode changes to reset cover page

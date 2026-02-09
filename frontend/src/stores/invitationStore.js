@@ -4,6 +4,7 @@ import { ref } from 'vue'
 export const useInvitationStore = defineStore('invitation', () => {
   const invitation = ref({
     id: null,
+    title: '',
     backgroundColor: '#f8f9fa',
     backgroundImage: null,
     musicUrl: null,
@@ -32,6 +33,7 @@ export const useInvitationStore = defineStore('invitation', () => {
   const resetInvitation = () => {
     invitation.value = {
       id: null,
+      title: '',
       backgroundColor: '#f8f9fa',
       backgroundImage: null,
       musicUrl: null,

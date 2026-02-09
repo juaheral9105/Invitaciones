@@ -33,6 +33,21 @@
 
       <div class="space-y-3">
         <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">
+            Nombre de la invitación
+          </label>
+          <input
+            v-model="store.invitation.title"
+            type="text"
+            placeholder="Ej: XV Años de María, Boda Juan y Ana"
+            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          />
+          <p class="text-xs text-gray-500 mt-1">
+            Identifica tu invitación con un nombre descriptivo
+          </p>
+        </div>
+
+        <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">Color de fondo</label>
           <input
             v-model="store.invitation.backgroundColor"
