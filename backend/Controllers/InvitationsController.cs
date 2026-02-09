@@ -70,6 +70,17 @@ namespace InvitacionesAPI.Controllers
                 MusicUrl = dto.MusicUrl,
                 SectionsJson = dto.Sections.HasValue ? dto.Sections.Value.GetRawText() : null,
                 FormEmail = dto.FormEmail,
+                CoverEnabled = dto.CoverEnabled,
+                CoverName = dto.CoverName,
+                CoverButtonText = dto.CoverButtonText,
+                CoverBackgroundColor = dto.CoverBackgroundColor,
+                CoverBackgroundImage = dto.CoverBackgroundImage,
+                CoverTextColor = dto.CoverTextColor,
+                CoverButtonColor = dto.CoverButtonColor,
+                CoverButtonTextColor = dto.CoverButtonTextColor,
+                CoverFontFamily = dto.CoverFontFamily,
+                CoverNameFontSize = dto.CoverNameFontSize,
+                CoverButtonFontSize = dto.CoverButtonFontSize,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -106,6 +117,17 @@ namespace InvitacionesAPI.Controllers
             invitation.MusicUrl = dto.MusicUrl;
             invitation.SectionsJson = dto.Sections.HasValue ? dto.Sections.Value.GetRawText() : null;
             invitation.FormEmail = dto.FormEmail;
+            invitation.CoverEnabled = dto.CoverEnabled;
+            invitation.CoverName = dto.CoverName;
+            invitation.CoverButtonText = dto.CoverButtonText;
+            invitation.CoverBackgroundColor = dto.CoverBackgroundColor;
+            invitation.CoverBackgroundImage = dto.CoverBackgroundImage;
+            invitation.CoverTextColor = dto.CoverTextColor;
+            invitation.CoverButtonColor = dto.CoverButtonColor;
+            invitation.CoverButtonTextColor = dto.CoverButtonTextColor;
+            invitation.CoverFontFamily = dto.CoverFontFamily;
+            invitation.CoverNameFontSize = dto.CoverNameFontSize;
+            invitation.CoverButtonFontSize = dto.CoverButtonFontSize;
             invitation.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -268,7 +290,18 @@ namespace InvitacionesAPI.Controllers
                 FontFamily = invitation.FontFamily,
                 MusicUrl = invitation.MusicUrl,
                 Sections = sections,
-                FormEmail = invitation.FormEmail
+                FormEmail = invitation.FormEmail,
+                CoverEnabled = invitation.CoverEnabled,
+                CoverName = invitation.CoverName,
+                CoverButtonText = invitation.CoverButtonText,
+                CoverBackgroundColor = invitation.CoverBackgroundColor,
+                CoverBackgroundImage = invitation.CoverBackgroundImage,
+                CoverTextColor = invitation.CoverTextColor,
+                CoverButtonColor = invitation.CoverButtonColor,
+                CoverButtonTextColor = invitation.CoverButtonTextColor,
+                CoverFontFamily = invitation.CoverFontFamily,
+                CoverNameFontSize = invitation.CoverNameFontSize,
+                CoverButtonFontSize = invitation.CoverButtonFontSize
             };
         }
     }

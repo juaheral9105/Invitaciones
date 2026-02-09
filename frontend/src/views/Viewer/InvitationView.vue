@@ -37,7 +37,7 @@
       :class="{ 'opacity-0': showCover && invitation.coverEnabled }"
       class="transition-opacity duration-1000"
     >
-      <InvitationDisplay :invitation="invitation" @submit-confirmation="handleConfirmation" />
+      <InvitationDisplay :invitation="invitation" :should-play-music="shouldPlayMusic" @submit-confirmation="handleConfirmation" />
     </div>
 
     <!-- Success Modal -->
@@ -70,6 +70,7 @@ const loading = ref(true)
 const error = ref(false)
 const showSuccessModal = ref(false)
 const showCover = ref(true)
+const shouldPlayMusic = ref(false)
 
 const API_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5247'
 
@@ -81,6 +82,7 @@ const getFullUrl = (url) => {
 
 const enterInvitation = () => {
   showCover.value = false
+  shouldPlayMusic.value = true
 }
 
 onMounted(async () => {

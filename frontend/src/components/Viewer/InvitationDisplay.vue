@@ -10,7 +10,7 @@
     }"
   >
     <!-- Music Player (Fixed) -->
-    <MusicPlayer v-if="invitation.musicUrl" :musicUrl="getImageUrl(invitation.musicUrl)" />
+    <MusicPlayer v-if="invitation.musicUrl" :musicUrl="getImageUrl(invitation.musicUrl)" :should-play="shouldPlayMusic" />
 
     <!-- Blocks Container -->
     <div class="max-w-4xl mx-auto">
@@ -61,6 +61,10 @@ const props = defineProps({
   invitation: {
     type: Object,
     required: true
+  },
+  shouldPlayMusic: {
+    type: Boolean,
+    default: false
   }
 })
 

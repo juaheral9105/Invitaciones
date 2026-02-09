@@ -302,6 +302,18 @@ const saveInvitation = async () => {
       fontFamily: store.invitation.fontFamily || 'Arial',
       musicUrl: store.invitation.musicUrl || null,
       formEmail: store.invitation.formEmail || null,
+      // Cover page configuration
+      coverEnabled: store.invitation.coverEnabled !== undefined ? store.invitation.coverEnabled : true,
+      coverName: store.invitation.coverName || 'Nombre de la Homenajeada',
+      coverButtonText: store.invitation.coverButtonText || 'Ver Invitación',
+      coverBackgroundColor: store.invitation.coverBackgroundColor || '#f3e5f5',
+      coverBackgroundImage: store.invitation.coverBackgroundImage || null,
+      coverTextColor: store.invitation.coverTextColor || '#ffffff',
+      coverButtonColor: store.invitation.coverButtonColor || '#ffffff',
+      coverButtonTextColor: store.invitation.coverButtonTextColor || '#000000',
+      coverFontFamily: store.invitation.coverFontFamily || 'Playfair Display',
+      coverNameFontSize: store.invitation.coverNameFontSize || '6rem',
+      coverButtonFontSize: store.invitation.coverButtonFontSize || '1.125rem',
       // Send blocks as sections for backend compatibility
       sections: store.invitation.blocks || []
     }

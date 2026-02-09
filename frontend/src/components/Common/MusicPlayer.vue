@@ -22,12 +22,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 const props = defineProps({
   musicUrl: {
     type: String,
     required: true
+  },
+  shouldPlay: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -45,17 +49,29 @@ const togglePlay = () => {
   }
 }
 
-onMounted(async () => {
-  // Auto-play with user interaction
-  if (audioPlayer.value) {
+const startMusic = async () => {
+  if (audioPlayer.value && !isPlaying.value) {
     audioPlayer.value.volume = 0.5
     try {
       await audioPlayer.value.play()
       isPlaying.value = true
     } catch (error) {
       console.log('Autoplay blocked by browser. User interaction required.')
-      // Si el autoplay falla, el usuario tendrá que hacer clic en el botón play
     }
+  }
+}
+
+// Watch for shouldPlay prop changes
+watch(() => props.shouldPlay, (newValue) => {
+  if (newValue) {
+    startMusic()
+  }
+})
+
+onMounted(async () => {
+  // Auto-play if shouldPlay is true
+  if (props.shouldPlay) {
+    startMusic()
   }
 })
 </script>

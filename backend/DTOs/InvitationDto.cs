@@ -21,6 +21,19 @@ namespace InvitacionesAPI.DTOs
         public string? MusicUrl { get; set; }
         public JsonElement? Sections { get; set; }  // Changed to JsonElement to accept any JSON structure
         public string? FormEmail { get; set; }
+
+        // Cover Page Configuration
+        public bool CoverEnabled { get; set; } = true;
+        public string CoverName { get; set; } = "Nombre de la Homenajeada";
+        public string CoverButtonText { get; set; } = "Ver Invitación";
+        public string CoverBackgroundColor { get; set; } = "#f3e5f5";
+        public string? CoverBackgroundImage { get; set; }
+        public string CoverTextColor { get; set; } = "#ffffff";
+        public string CoverButtonColor { get; set; } = "#ffffff";
+        public string CoverButtonTextColor { get; set; } = "#000000";
+        public string CoverFontFamily { get; set; } = "Playfair Display";
+        public string CoverNameFontSize { get; set; } = "6rem";
+        public string CoverButtonFontSize { get; set; } = "1.125rem";
     }
 
     public class SectionDto

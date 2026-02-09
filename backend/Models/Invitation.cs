@@ -56,6 +56,39 @@ namespace InvitacionesAPI.Models
         [MaxLength(200)]
         public string? FormEmail { get; set; }
 
+        // Cover Page Configuration
+        public bool CoverEnabled { get; set; } = true;
+
+        [MaxLength(200)]
+        public string CoverName { get; set; } = "Nombre de la Homenajeada";
+
+        [MaxLength(100)]
+        public string CoverButtonText { get; set; } = "Ver Invitación";
+
+        [MaxLength(50)]
+        public string CoverBackgroundColor { get; set; } = "#f3e5f5";
+
+        [MaxLength(500)]
+        public string? CoverBackgroundImage { get; set; }
+
+        [MaxLength(50)]
+        public string CoverTextColor { get; set; } = "#ffffff";
+
+        [MaxLength(50)]
+        public string CoverButtonColor { get; set; } = "#ffffff";
+
+        [MaxLength(50)]
+        public string CoverButtonTextColor { get; set; } = "#000000";
+
+        [MaxLength(100)]
+        public string CoverFontFamily { get; set; } = "Playfair Display";
+
+        [MaxLength(50)]
+        public string CoverNameFontSize { get; set; } = "6rem";
+
+        [MaxLength(50)]
+        public string CoverButtonFontSize { get; set; } = "1.125rem";
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAt { get; set; }
