@@ -231,9 +231,17 @@ onMounted(async () => {
     isEditing.value = true
     try {
       const response = await invitationService.getById(id)
-      // Convert old format to new format if needed
-      if (response.data.sections && !response.data.blocks) {
-        response.data.blocks = convertSectionsToBlocks(response.data.sections)
+      // Convert sections to blocks (backend returns sections, we use blocks internally)
+      if (response.data.sections) {
+        // Check if sections is already in blocks format or old format
+        const firstSection = response.data.sections[0]
+        if (firstSection && firstSection.id && firstSection.type) {
+          // Already in blocks format, just rename
+          response.data.blocks = response.data.sections
+        } else {
+          // Old sections format, need conversion
+          response.data.blocks = convertSectionsToBlocks(response.data.sections)
+        }
         delete response.data.sections
       }
       store.setInvitation(response.data)
@@ -279,8 +287,10 @@ const saveInvitation = async () => {
     const data = {
       title: store.invitation.title || 'Invitación sin título',
       ...store.invitation,
-      // Convert blocks to JSON for backend
-      blocksJson: JSON.stringify(store.invitation.blocks)
+      // Send blocks as sections for backend compatibility
+      sections: store.invitation.blocks,
+      // Remove blocks from the data object to avoid sending it
+      blocks: undefined
     }
 
     if (data.id) {
@@ -288,6 +298,11 @@ const saveInvitation = async () => {
       showMessage('✅ Invitación actualizada exitosamente', 'success')
     } else {
       const response = await invitationService.create(data)
+      // Backend returns sections, convert to blocks
+      if (response.data.sections && !response.data.blocks) {
+        response.data.blocks = response.data.sections
+        delete response.data.sections
+      }
       store.setInvitation(response.data)
       showMessage('✅ Invitación creada exitosamente', 'success')
       router.push({ name: 'EditorEdit', params: { id: response.data.id } })
@@ -403,9 +418,17 @@ const enterInvitation = () => {
 // Handle loading an invitation from the modal
 const handleLoadInvitation = async (invitationData) => {
   try {
-    // Convert sections to blocks if needed (for backward compatibility)
-    if (invitationData.sections && !invitationData.blocks) {
-      invitationData.blocks = convertSectionsToBlocks(invitationData.sections)
+    // Convert sections to blocks (backend returns sections, we use blocks internally)
+    if (invitationData.sections) {
+      // Check if sections is already in blocks format or old format
+      const firstSection = invitationData.sections[0]
+      if (firstSection && firstSection.id && firstSection.type) {
+        // Already in blocks format, just rename
+        invitationData.blocks = invitationData.sections
+      } else {
+        // Old sections format, need conversion
+        invitationData.blocks = convertSectionsToBlocks(invitationData.sections)
+      }
       delete invitationData.sections
     }
 
