@@ -285,31 +285,35 @@ const saveInvitation = async () => {
   saving.value = true
   try {
     // Only send fields that backend expects (InvitationDto)
+    // Remove undefined values to avoid backend validation errors
     const data = {
       title: store.invitation.title || 'Invitación sin título',
-      subtitle: store.invitation.subtitle,
-      celebrantName: store.invitation.celebrantName,
-      eventDate: store.invitation.eventDate,
-      eventTime: store.invitation.eventTime,
-      venue: store.invitation.venue,
-      address: store.invitation.address,
-      locationLat: store.invitation.locationLat,
-      locationLng: store.invitation.locationLng,
-      backgroundColor: store.invitation.backgroundColor,
-      backgroundImage: store.invitation.backgroundImage,
-      textColor: store.invitation.textColor,
-      fontFamily: store.invitation.fontFamily,
-      musicUrl: store.invitation.musicUrl,
-      formEmail: store.invitation.formEmail,
+      subtitle: store.invitation.subtitle || null,
+      celebrantName: store.invitation.celebrantName || null,
+      eventDate: store.invitation.eventDate || null,
+      eventTime: store.invitation.eventTime || null,
+      venue: store.invitation.venue || null,
+      address: store.invitation.address || null,
+      locationLat: store.invitation.locationLat || null,
+      locationLng: store.invitation.locationLng || null,
+      backgroundColor: store.invitation.backgroundColor || '#ffffff',
+      backgroundImage: store.invitation.backgroundImage || null,
+      textColor: store.invitation.textColor || '#000000',
+      fontFamily: store.invitation.fontFamily || 'Arial',
+      musicUrl: store.invitation.musicUrl || null,
+      formEmail: store.invitation.formEmail || null,
       // Send blocks as sections for backend compatibility
-      sections: store.invitation.blocks
+      sections: store.invitation.blocks || []
     }
+
+    console.log('Saving invitation with data:', data)
 
     if (store.invitation.id) {
       await invitationService.update(store.invitation.id, data)
       showMessage('✅ Invitación actualizada exitosamente', 'success')
     } else {
       const response = await invitationService.create(data)
+      console.log('Create response:', response.data)
       // Backend returns sections, convert to blocks
       if (response.data.sections && !response.data.blocks) {
         response.data.blocks = response.data.sections
@@ -321,7 +325,8 @@ const saveInvitation = async () => {
     }
   } catch (error) {
     showMessage('❌ Error al guardar la invitación', 'error')
-    console.error(error)
+    console.error('Save error:', error)
+    console.error('Error response:', error.response?.data)
   } finally {
     saving.value = false
   }
