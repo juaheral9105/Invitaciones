@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace InvitacionesAPI.DTOs
 {
     public class InvitationDto
@@ -17,7 +19,7 @@ namespace InvitacionesAPI.DTOs
         public string TextColor { get; set; } = "#000000";
         public string FontFamily { get; set; } = "Arial";
         public string? MusicUrl { get; set; }
-        public List<SectionDto>? Sections { get; set; }
+        public JsonElement? Sections { get; set; }  // Changed to JsonElement to accept any JSON structure
         public string? FormEmail { get; set; }
     }
 

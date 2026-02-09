@@ -68,7 +68,7 @@ namespace InvitacionesAPI.Controllers
                 TextColor = dto.TextColor,
                 FontFamily = dto.FontFamily,
                 MusicUrl = dto.MusicUrl,
-                SectionsJson = dto.Sections != null ? JsonSerializer.Serialize(dto.Sections) : null,
+                SectionsJson = dto.Sections.HasValue ? dto.Sections.Value.GetRawText() : null,
                 FormEmail = dto.FormEmail,
                 CreatedAt = DateTime.UtcNow
             };
@@ -104,7 +104,7 @@ namespace InvitacionesAPI.Controllers
             invitation.TextColor = dto.TextColor;
             invitation.FontFamily = dto.FontFamily;
             invitation.MusicUrl = dto.MusicUrl;
-            invitation.SectionsJson = dto.Sections != null ? JsonSerializer.Serialize(dto.Sections) : null;
+            invitation.SectionsJson = dto.Sections.HasValue ? dto.Sections.Value.GetRawText() : null;
             invitation.FormEmail = dto.FormEmail;
             invitation.UpdatedAt = DateTime.UtcNow;
 
@@ -236,17 +236,17 @@ namespace InvitacionesAPI.Controllers
 
         private static InvitationDto MapToDto(Invitation invitation)
         {
-            List<SectionDto>? sections = null;
+            JsonElement? sections = null;
 
             if (!string.IsNullOrEmpty(invitation.SectionsJson))
             {
                 try
                 {
-                    sections = JsonSerializer.Deserialize<List<SectionDto>>(invitation.SectionsJson);
+                    sections = JsonSerializer.Deserialize<JsonElement>(invitation.SectionsJson);
                 }
                 catch
                 {
-                    sections = new List<SectionDto>();
+                    // Leave as null if deserialization fails
                 }
             }
 
