@@ -79,10 +79,26 @@ namespace InvitacionesAPI.Services
         {
             try
             {
-                // Debug: Log configuration sources
+                // Debug: Log ALL environment variables that start with "Email"
                 _logger.LogInformation("=== EMAIL CONFIG DEBUG ===");
-                _logger.LogInformation("Checking Email__SmtpHost env var: {EnvHost}", Environment.GetEnvironmentVariable("Email__SmtpHost") ?? "NOT SET");
-                _logger.LogInformation("Checking Email__SmtpUser env var: {EnvUser}", Environment.GetEnvironmentVariable("Email__SmtpUser") ?? "NOT SET");
+                _logger.LogInformation("ALL Environment Variables starting with 'Email':");
+                foreach (var envVar in Environment.GetEnvironmentVariables().Keys)
+                {
+                    var key = envVar.ToString();
+                    if (key?.StartsWith("Email", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        var value = Environment.GetEnvironmentVariable(key);
+                        // Mask password if present
+                        var displayValue = key.Contains("Password", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(value)
+                            ? "***MASKED***"
+                            : value ?? "NOT SET";
+                        _logger.LogInformation("  {Key} = {Value}", key, displayValue);
+                    }
+                }
+
+                _logger.LogInformation("Direct checks:");
+                _logger.LogInformation("  Email__SmtpHost: {EnvHost}", Environment.GetEnvironmentVariable("Email__SmtpHost") ?? "NOT SET");
+                _logger.LogInformation("  Email__SmtpUser: {EnvUser}", Environment.GetEnvironmentVariable("Email__SmtpUser") ?? "NOT SET");
 
                 var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
                 var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
