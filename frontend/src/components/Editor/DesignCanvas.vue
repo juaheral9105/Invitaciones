@@ -99,6 +99,8 @@
                   :is="getBlockComponent(block.type)"
                   :block="block"
                   :preview-mode="props.previewMode"
+                  :invitation-id="store.invitation.id"
+                  :form-email="store.invitation.formEmail"
                 />
               </div>
             </div>

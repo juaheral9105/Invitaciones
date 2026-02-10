@@ -181,7 +181,9 @@ import { useInvitationStore } from '../../../stores/invitationStore'
 
 const props = defineProps({
   block: Object,
-  previewMode: Boolean
+  previewMode: Boolean,
+  invitationId: String,
+  formEmail: String
 })
 
 const store = useInvitationStore()
@@ -226,7 +228,8 @@ const validatePhone = async () => {
   }
 
   // Si no hay invitationId, permitir envío sin validación
-  if (!store.invitation.id) {
+  const invitationId = props.invitationId || store.invitation.id
+  if (!invitationId) {
     phoneValidated.value = true
     guestData.value = null
     return
@@ -236,7 +239,7 @@ const validatePhone = async () => {
   phoneError.value = ''
 
   try {
-    const response = await guestListService.getGuestByPhone(store.invitation.id, phone)
+    const response = await guestListService.getGuestByPhone(invitationId, phone)
     guestData.value = response.data
     console.log('Guest data received from API:', guestData.value)
     console.log('Guest names field:', guestData.value.guestNames)
@@ -407,7 +410,8 @@ const shouldShowSubmitButton = computed(() => {
 const handleSubmit = async () => {
   try {
     // Verificar que hay un email configurado
-    if (!store.invitation.formEmail) {
+    const emailTo = props.formEmail || store.invitation.formEmail
+    if (!emailTo) {
       alert('Error: No hay un correo electrónico configurado para recibir confirmaciones')
       return
     }
@@ -434,7 +438,7 @@ const handleSubmit = async () => {
 
     // Enviar email
     await confirmationService.sendEmail({
-      toEmail: store.invitation.formEmail,
+      toEmail: emailTo,
       phone: formData.value.phone,
       formData: formDataToSend
     })

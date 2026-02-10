@@ -24,6 +24,8 @@
             :is="getBlockComponent(block.type)"
             :block="block"
             :preview-mode="true"
+            :invitation-id="invitation.id"
+            :form-email="invitation.formEmail"
           />
         </div>
       </div>
