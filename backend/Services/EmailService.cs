@@ -79,14 +79,23 @@ namespace InvitacionesAPI.Services
         {
             try
             {
-                var prueba = Environment.GetEnvironmentVariable("Email__SmtpHost");
-                var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail2.com";
+                // Debug: Log configuration sources
+                _logger.LogInformation("=== EMAIL CONFIG DEBUG ===");
+                _logger.LogInformation("Checking Email__SmtpHost env var: {EnvHost}", Environment.GetEnvironmentVariable("Email__SmtpHost") ?? "NOT SET");
+                _logger.LogInformation("Checking Email__SmtpUser env var: {EnvUser}", Environment.GetEnvironmentVariable("Email__SmtpUser") ?? "NOT SET");
+
+                var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
                 var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
                 var smtpUser = _configuration["Email:SmtpUser"];
                 var smtpPassword = _configuration["Email:SmtpPassword"];
                 var fromEmail = _configuration["Email:FromEmail"];
                 var fromName = _configuration["Email:FromName"] ?? "Sistema de Invitaciones";
-                _logger.LogInformation("SMTP Host: {Host}, Port: {Port}, PRUEBA:{prueba}", smtpHost, smtpPort, prueba);
+
+                _logger.LogInformation("Final SMTP Host: {Host}", smtpHost);
+                _logger.LogInformation("Final SMTP Port: {Port}", smtpPort);
+                _logger.LogInformation("SMTP User configured: {Configured}", !string.IsNullOrEmpty(smtpUser) ? "YES" : "NO");
+                _logger.LogInformation("========================");
+
                 if (string.IsNullOrEmpty(smtpUser) || string.IsNullOrEmpty(smtpPassword))
                 {
                     _logger.LogWarning("Email configuration is missing. Skipping email send.");
