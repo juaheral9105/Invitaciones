@@ -16,10 +16,9 @@ var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL")
  logger.LogInformation("=== ENV VARS ===");
 foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
 {
-    if (env.Key.ToString()!.StartsWith("Email__"))
-    {
-        logger.LogInformation($"{env.Key} = {env.Value}");
-    }
+    
+    logger.LogInformation($"{env.Key} = {env.Value}");
+    
 }
 
 if (!string.IsNullOrEmpty(databaseUrl) && (databaseUrl.StartsWith("postgres://") || databaseUrl.StartsWith("postgresql://")))
