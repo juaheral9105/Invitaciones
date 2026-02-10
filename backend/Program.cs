@@ -8,6 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Use PostgreSQL database - Get connection string from environment variables or config
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+Console.WriteLine("=== ENV VARS ===");
+foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
+{
+    if (env.Key.ToString()!.StartsWith("Email__"))
+    {
+        Console.WriteLine($"{env.Key} = {env.Value}");
+    }
+}
+
 // Try Railway's DATABASE_PUBLIC_URL or DATABASE_URL if not found in config
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL")
                   ?? Environment.GetEnvironmentVariable("DATABASE_URL");
