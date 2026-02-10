@@ -186,7 +186,7 @@ namespace InvitacionesAPI.Services
             catch (Exception ex)
             {
                 _logger.LogError(" Error enviando correo");
-                _logger.LogError(ex.ToString());
+                _logger.LogError(ex.Message);
                 _logger.LogError(ex, $"Error sending form confirmation email to {toEmail}");
                 throw;
             }
