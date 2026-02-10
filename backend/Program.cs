@@ -92,15 +92,8 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<ApplicationDbContext>();
         var logger = services.GetRequiredService<ILogger<Program>>();
 
- logger.LogInformation("=== ENV VARS ===");
-foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
-{
-    if (env.Key.ToString()!.StartsWith("Email__"))
-    {
-        logger.LogInformation($"{env.Key} = {env.Value}");
-    }
-}
-
+        
+        
         // Try to create the database if it doesn't exist
         context.Database.EnsureCreated();
 
@@ -182,6 +175,15 @@ foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
                 ";
                 context.Database.ExecuteSqlRaw(coverPageSql);
                 logger.LogInformation("Cover page columns added or already exist.");
+
+                logger.LogInformation("=== ENV VARS ===");
+                foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
+                {
+                    if (env.Key.ToString()!.StartsWith("Email__"))
+                    {
+                        logger.LogInformation($"{env.Key} = {env.Value}");
+                    }
+                }
             }
             catch (Exception ex3)
             {
