@@ -58,6 +58,9 @@ namespace InvitacionesAPI.Services
                 message.Body = bodyBuilder.ToMessageBody();
 
                 using var client = new SmtpClient();
+                // Set short timeout (3 seconds) for fast failure when SMTP not configured
+                client.Timeout = 3000;
+
                 await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(smtpUser, smtpPassword);
                 await client.SendAsync(message);
@@ -67,8 +70,8 @@ namespace InvitacionesAPI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error sending email to {toEmail}");
-                throw;
+                _logger.LogWarning($"Email not sent (SMTP not configured or failed). Confirmation still processed successfully. Error: {ex.Message}");
+                // Don't throw exception - confirmation is still successful even without email
             }
         }
 
@@ -176,6 +179,9 @@ namespace InvitacionesAPI.Services
                 message.Body = bodyBuilder.ToMessageBody();
 
                 using var client = new SmtpClient();
+                // Set short timeout (3 seconds) for fast failure when SMTP not configured
+                client.Timeout = 3000;
+
                 await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(smtpUser, smtpPassword);
                 await client.SendAsync(message);
@@ -185,10 +191,8 @@ namespace InvitacionesAPI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(" Error enviando correo");
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex, $"Error sending form confirmation email to {toEmail}");
-                throw;
+                _logger.LogWarning($"Email not sent (SMTP not configured or failed). Confirmation still processed successfully. Error: {ex.Message}");
+                // Don't throw exception - confirmation is still successful even without email
             }
         }
     }
