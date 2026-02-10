@@ -79,7 +79,7 @@ namespace InvitacionesAPI.Services
         {
             try
             {
-                var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
+                var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail2.com";
                 var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
                 var smtpUser = _configuration["Email:SmtpUser"];
                 var smtpPassword = _configuration["Email:SmtpPassword"];
