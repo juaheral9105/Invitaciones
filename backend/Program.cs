@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using InvitacionesAPI.Data;
 using InvitacionesAPI.Services;
+using System.Collections
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,13 +13,13 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL")
                   ?? Environment.GetEnvironmentVariable("DATABASE_URL");
 
-
+ logger.LogInformation("=== ENV VARS ===");
 foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
 {
-    //if (env.Key.ToString()!.StartsWith("Email__"))
-    //{
-        //logger.LogInformation($"{env.Key} = {env.Value}");
-    //}
+    if (env.Key.ToString()!.StartsWith("Email__"))
+    {
+        logger.LogInformation($"{env.Key} = {env.Value}");
+    }
 }
 
 if (!string.IsNullOrEmpty(databaseUrl) && (databaseUrl.StartsWith("postgres://") || databaseUrl.StartsWith("postgresql://")))
