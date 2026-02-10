@@ -13,15 +13,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL")
                   ?? Environment.GetEnvironmentVariable("DATABASE_URL");
 
- logger.LogInformation("=== ENV VARS ===");
-foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
-{
-    if (env.Key.ToString()!.StartsWith("Email__"))
-    {
-        logger.LogInformation($"{env.Key} = {env.Value}");
-    }
-}
-
 if (!string.IsNullOrEmpty(databaseUrl) && (databaseUrl.StartsWith("postgres://") || databaseUrl.StartsWith("postgresql://")))
 {
     // Convert PostgreSQL URL format to .NET connection string format
@@ -100,6 +91,15 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         var logger = services.GetRequiredService<ILogger<Program>>();
+
+ logger.LogInformation("=== ENV VARS ===");
+foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
+{
+    if (env.Key.ToString()!.StartsWith("Email__"))
+    {
+        logger.LogInformation($"{env.Key} = {env.Value}");
+    }
+}
 
         // Try to create the database if it doesn't exist
         context.Database.EnsureCreated();
