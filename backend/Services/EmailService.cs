@@ -85,7 +85,7 @@ namespace InvitacionesAPI.Services
                 var smtpPassword = _configuration["Email:SmtpPassword"];
                 var fromEmail = _configuration["Email:FromEmail"];
                 var fromName = _configuration["Email:FromName"] ?? "Sistema de Invitaciones";
-
+                _logger.LogInformation("SMTP Host: {Host}, Port: {Port}", smtpHost, smtpPort);
                 if (string.IsNullOrEmpty(smtpUser) || string.IsNullOrEmpty(smtpPassword))
                 {
                     _logger.LogWarning("Email configuration is missing. Skipping email send.");
@@ -181,7 +181,7 @@ namespace InvitacionesAPI.Services
                 using var client = new SmtpClient();
                 // Set short timeout (3 seconds) for fast failure when SMTP not configured
                 client.Timeout = 3000;
-                _logger.LogInformation("SMTP Host: {Host}, Port: {Port}", smtpHost, smtpPort);
+               
                 await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(smtpUser, smtpPassword);
                 await client.SendAsync(message);
