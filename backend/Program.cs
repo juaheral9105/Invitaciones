@@ -179,10 +179,9 @@ using (var scope = app.Services.CreateScope())
                 logger.LogInformation("=== ENV VARS ===");
                 foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
                 {
-                    if (env.Key.ToString()!.StartsWith("Email__"))
-                    {
-                        logger.LogInformation($"{env.Key} = {env.Value}");
-                    }
+                    
+                    logger.LogInformation($"{env.Key} = {env.Value}");
+                    
                 }
             }
             catch (Exception ex3)
