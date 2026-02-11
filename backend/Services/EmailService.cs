@@ -251,7 +251,12 @@ namespace InvitacionesAPI.Services
 
             var response = await client.SendEmailAsync(msg);
 
-                _logger.LogInformation($"Form confirmation email sent successfully to {toEmail}");
+            _logger.LogInformation("SendGrid StatusCode: {StatusCode}", response.StatusCode);
+
+            var body = await response.Body.ReadAsStringAsync();
+            _logger.LogInformation("SendGrid Response Body: {Body}", body);
+
+            _logger.LogInformation($"Form confirmation email sent successfully to {toEmail}");
             }
             catch (Exception ex)
             {
