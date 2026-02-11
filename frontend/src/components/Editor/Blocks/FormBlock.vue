@@ -410,7 +410,7 @@ console.log('prueba 4')
     if (!evaluateFieldVisibility(field)) return false // Campo no visible
 
     const value = formData.value.customFields[index]
-
+    console.log(value)
     return value && String(value).trim() !== ''
   })
 
