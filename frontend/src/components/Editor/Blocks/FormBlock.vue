@@ -410,7 +410,12 @@ console.log('prueba 4')
     if (!evaluateFieldVisibility(field)) return false // Campo no visible
 
     if (!field.visible){
+      console.log('prueba 6.1')
+      console.log(field.fieldLabel)
+       console.log(field.visible)
+        console.log(field.required)
       field.required = false;
+      console.log(field.required)
     }
     console.log('prueba 7')
 
