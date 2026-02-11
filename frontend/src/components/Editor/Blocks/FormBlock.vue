@@ -315,6 +315,7 @@ const evaluateFieldVisibility = (field) => {
       return true
   }
 
+
   // Debug logging
   console.log('Evaluando visibilidad:', {
     fieldLabel: field.label,
@@ -385,26 +386,47 @@ const formattedGreetingMessage = computed(() => {
 // Calcular si mostrar el botón de envío
 const shouldShowSubmitButton = computed(() => {
   // En modo edición, siempre mostrar
+
+console.log('prueba 1')
+
   if (!props.previewMode) return true
+
+console.log('prueba 2')
 
   // En modo preview, requiere teléfono validado Y que el invitado esté en el Excel
   if (!phoneValidated.value) return false
+
+console.log('prueba 3')
+
   if (!guestData.value) return false // NUEVO: Solo si está en el Excel
+
+console.log('prueba 4')
 
   // Verificar si hay al menos un campo requerido lleno
   const hasRequiredFieldFilled = props.block.content.customFields.some((field, index) => {
+    console.log('prueba 5')
     if (!field.required) return false
+    console.log('prueba 6')
     if (!evaluateFieldVisibility(field)) return false // Campo no visible
+
+    console.log('prueba 7')
 
     const value = formData.value.customFields[index]
     return value && String(value).trim() !== ''
   })
 
+  console.log('prueba 8')
+
   // Si no hay campos requeridos, mostrar el botón
   const hasRequiredFields = props.block.content.customFields.some(field => field.required)
   if (!hasRequiredFields) return true
 
+  console.log('prueba 9')
+
+  console.log(hasRequiredFieldFilled)
   return hasRequiredFieldFilled
+
+
 })
 
 const handleSubmit = async () => {
