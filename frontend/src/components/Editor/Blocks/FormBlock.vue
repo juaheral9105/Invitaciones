@@ -49,8 +49,8 @@
           marginRight: 'auto'
         }"
       >
-        <label class="block font-medium mb-2 text-sm">
-          Número de teléfono*
+        <label class="block font-medium mb-2 text-sm w-full">
+          Ingresa tu número de celular*
         </label>
         <input
           type="tel"
