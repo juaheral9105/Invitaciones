@@ -1,6 +1,8 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace InvitacionesAPI.Services
 {
@@ -211,22 +213,43 @@ namespace InvitacionesAPI.Services
                 };
 
                 message.Body = bodyBuilder.ToMessageBody();
-
-                using var client = new SmtpClient();
+                
+               // using var client = new SmtpClient();
                 // Set short timeout (3 seconds) for fast failure when SMTP not configured
-               client.AuthenticationMechanisms.Remove("XOAUTH2");
-               client.Timeout = 60000;
+              // client.AuthenticationMechanisms.Remove("XOAUTH2");
+              // client.Timeout = 60000;
 
-                client.LocalDomain = "localhost";
-                _logger.LogInformation("Connecting to SMTP...");
-                await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
-                _logger.LogInformation("Connected!");
+              //  client.LocalDomain = "localhost";
+              //  _logger.LogInformation("Connecting to SMTP...");
+              //  await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
+              //  _logger.LogInformation("Connected!");
 
-                _logger.LogInformation("Authenticating...");
-                await client.AuthenticateAsync(smtpUser, smtpPassword);
-                _logger.LogInformation("Authenticated!");
-                await client.SendAsync(message);
-                await client.DisconnectAsync(true);
+              //  _logger.LogInformation("Authenticating...");
+              //  await client.AuthenticateAsync(smtpUser, smtpPassword);
+              //  _logger.LogInformation("Authenticated!");
+              //  await client.SendAsync(message);
+              //  await client.DisconnectAsync(true);
+
+
+             //string plainTextContent = bodyBuilder.ToMessageBody();
+
+            var client = new SendGridClient(Environment.GetEnvironmentVariable("SENDGRID_API_KEY"));
+
+            var from = new EmailAddress(
+                Environment.GetEnvironmentVariable("EMAIL_FROM"),
+                Environment.GetEnvironmentVariable("EMAIL_FROM_NAME")
+            );
+
+            var to = new EmailAddress(destinatario);
+            var msg = MailHelper.CreateSingleEmail(
+                from,
+                to,
+                "Prueba SendGrid",
+                "Correo de prueba",
+                "<strong>Correo de prueba</strong>"
+            );
+
+            var response = await client.SendEmailAsync(msg);
 
                 _logger.LogInformation($"Form confirmation email sent successfully to {toEmail}");
             }
