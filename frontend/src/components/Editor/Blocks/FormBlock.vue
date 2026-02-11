@@ -135,7 +135,7 @@
             </label>
             <select
               v-model="formData.customFields[index]"
-              :required="field.required"
+              :required="field.required && field.visible"
               class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="">{{ field.placeholder || 'Seleccionar opción...' }}</option>
@@ -420,6 +420,9 @@ console.log('prueba 4')
     console.log('prueba 7')
 
     const value = formData.value.customFields[index]
+
+ console.log(value)
+
     return value && String(value).trim() !== ''
   })
 
