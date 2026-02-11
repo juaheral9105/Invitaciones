@@ -403,11 +403,11 @@ console.log('prueba 3')
 console.log('prueba 4')
 
 // Verificar que TODOS los campos requeridos y visibles estén llenos
-const allRequiredFieldsFilled = props.block.content.customFields.every((field, index) => {
+const hasRequiredFieldFilled = props.block.content.customFields.every((field, index) => {
   // Si el campo NO es requerido, no afecta la validación
   console.log(field.visibilityRules?.enabled)
 
-  if (!field.visibilityRules?.enabled){
+  //if (!field.visibilityRules?.enabled){
     if (!field.required) return true
 
     // Si el campo no es visible, no se valida
@@ -416,7 +416,7 @@ const allRequiredFieldsFilled = props.block.content.customFields.every((field, i
     const value = formData.value.customFields[index]
 
     return value && String(value).trim() !== ''
-  }
+  //}
 })
 
     console.log('prueba 7')
