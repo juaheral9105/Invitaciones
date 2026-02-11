@@ -246,7 +246,7 @@ namespace InvitacionesAPI.Services
                 to,
                 "Prueba SendGrid",
                 "Correo de prueba",
-                "<strong>Correo de prueba</strong>"
+                message
             );
 
             var response = await client.SendEmailAsync(msg);
