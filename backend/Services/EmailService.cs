@@ -214,10 +214,17 @@ namespace InvitacionesAPI.Services
 
                 using var client = new SmtpClient();
                 // Set short timeout (3 seconds) for fast failure when SMTP not configured
-                client.Timeout = 3000;
                client.AuthenticationMechanisms.Remove("XOAUTH2");
+               client.Timeout = 60000;
+
+                client.LocalDomain = "localhost";
+                _logger.LogInformation("Connecting to SMTP...");
                 await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
+                _logger.LogInformation("Connected!");
+
+                _logger.LogInformation("Authenticating...");
                 await client.AuthenticateAsync(smtpUser, smtpPassword);
+                _logger.LogInformation("Authenticated!");
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
 
