@@ -409,6 +409,9 @@ console.log('prueba 4')
     console.log('prueba 6')
     if (!evaluateFieldVisibility(field)) return false // Campo no visible
 
+    if (!field.visible){
+      field.required = false;
+    }
     console.log('prueba 7')
 
     const value = formData.value.customFields[index]
@@ -416,6 +419,8 @@ console.log('prueba 4')
   })
 
   console.log('prueba 8')
+
+
 
   // Si no hay campos requeridos, mostrar el botón
   const hasRequiredFields = props.block.content.customFields.some(field => field.required && field.visible)
