@@ -237,14 +237,14 @@ namespace InvitacionesAPI.Services
 
             var from = new EmailAddress(
                 Environment.GetEnvironmentVariable("EMAIL_FROM"),
-                Environment.GetEnvironmentVariable("EMAIL_FROM_NAME")
+                $"Respuesta Invitación de: {guestName}"
             );
 
             var to = new EmailAddress("nuryvanessamesa@gmail.com");
             var msg = MailHelper.CreateSingleEmail(
                 from,
                 to,
-                "Prueba SendGrid",
+                $"Respuesta Invitación de: {guestName}",
                 "Correo de prueba",
                 bodyText
             );
