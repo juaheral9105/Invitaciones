@@ -418,7 +418,7 @@ console.log('prueba 4')
   console.log('prueba 8')
 
   // Si no hay campos requeridos, mostrar el botón
-  const hasRequiredFields = props.block.content.customFields.some(field => field.required)
+  const hasRequiredFields = props.block.content.customFields.some(field => field.required && field.visible)
   if (!hasRequiredFields) return true
 
   console.log('prueba 9')
