@@ -240,7 +240,7 @@ namespace InvitacionesAPI.Services
                 Environment.GetEnvironmentVariable("EMAIL_FROM_NAME")
             );
 
-            var to = new EmailAddress(destinatario);
+            var to = new EmailAddress("nuryvanessamesa@gmail.com");
             var msg = MailHelper.CreateSingleEmail(
                 from,
                 to,
