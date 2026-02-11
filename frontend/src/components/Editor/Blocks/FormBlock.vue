@@ -402,18 +402,18 @@ console.log('prueba 3')
 
 console.log('prueba 4')
 
-  // Verificar si hay al menos un campo requerido lleno
-  const hasRequiredFieldFilled = props.block.content.customFields.some((field, index) => {
-    console.log('prueba 5')
-    if (!field.required) return false
-    console.log('prueba 6')
-    if (!evaluateFieldVisibility(field)) return false // Campo no visible
+// Verificar que TODOS los campos requeridos y visibles estén llenos
+const allRequiredFieldsFilled = props.block.content.customFields.every((field, index) => {
+  // Si el campo NO es requerido, no afecta la validación
+  if (!field.required) return true
 
-    const value = formData.value.customFields[index]
-    console.log(field)
-    console.log(value)
-    return value && String(value).trim() !== ''
-  })
+  // Si el campo no es visible, no se valida
+  if (!evaluateFieldVisibility(field)) return true
+
+  const value = formData.value.customFields[index]
+
+  return value && String(value).trim() !== ''
+})
 
     console.log('prueba 7')
   // Si no hay campos requeridos, mostrar el botón
