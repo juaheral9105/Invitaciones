@@ -62,9 +62,15 @@ namespace InvitacionesAPI.Services
                 client.Timeout = 60000;
 
                 client.LocalDomain = "localhost";
-
+                _logger.LogInformation("Connecting to SMTP...");
                 await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
+                _logger.LogInformation("Connected!");
+
+                _logger.LogInformation("Authenticating...");
                 await client.AuthenticateAsync(smtpUser, smtpPassword);
+                _logger.LogInformation("Authenticated!");
+                //await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
+                //await client.AuthenticateAsync(smtpUser, smtpPassword);
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
 
