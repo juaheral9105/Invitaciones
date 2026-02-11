@@ -59,7 +59,9 @@ namespace InvitacionesAPI.Services
 
                 using var client = new SmtpClient();
                 // Set short timeout (3 seconds) for fast failure when SMTP not configured
-                client.Timeout = 3000;
+                client.Timeout = 60000;
+
+                client.LocalDomain = "localhost";
 
                 await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(smtpUser, smtpPassword);
