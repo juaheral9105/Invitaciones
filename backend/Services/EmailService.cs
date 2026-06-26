@@ -1,3 +1,4 @@
+// Email service using Resend API
 using Resend;
 
 namespace InvitacionesAPI.Services
