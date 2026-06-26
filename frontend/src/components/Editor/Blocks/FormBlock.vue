@@ -166,7 +166,7 @@
           }"
           class="hover:scale-105 hover:shadow-lg"
         >
-          {{ block.content.buttonText || 'Responder Invitación' }}
+          Responder Invitación
         </button>
       </div>
     </form>
