@@ -1,5 +1,7 @@
-// Email service using Resend API
-using Resend;
+// Email service using Resend API (HTTP Client)
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace InvitacionesAPI.Services
 {
@@ -7,11 +9,13 @@ namespace InvitacionesAPI.Services
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<EmailService> _logger;
+        private readonly HttpClient _httpClient;
 
         public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
         {
             _configuration = configuration;
             _logger = logger;
+            _httpClient = new HttpClient();
         }
 
         public async Task SendConfirmationEmailAsync(string toEmail, string guestName, string eventName, bool willAttend, int numberOfGuests)
@@ -26,8 +30,6 @@ namespace InvitacionesAPI.Services
                     _logger.LogWarning("Resend API key is missing. Skipping email send.");
                     return;
                 }
-
-                var client = new ResendClient(apiKey);
 
                 var htmlBody = $@"
                     <html>
@@ -44,18 +46,7 @@ namespace InvitacionesAPI.Services
                     </html>
                 ";
 
-                var message = new EmailMessage
-                {
-                    From = fromEmail,
-                    Subject = $"Confirmacion de asistencia - {eventName}",
-                    HtmlBody = htmlBody
-                };
-                message.To.Add(toEmail);
-
-                var response = await client.EmailSendAsync(message);
-
-                _logger.LogInformation("Resend response - Email sent with ID: {Id}", response?.Id);
-                _logger.LogInformation("Email sent successfully to {ToEmail}", toEmail);
+                await SendEmailViaResendAsync(apiKey, fromEmail, toEmail, $"Confirmacion de asistencia - {eventName}", htmlBody);
             }
             catch (Exception ex)
             {
@@ -150,30 +141,50 @@ namespace InvitacionesAPI.Services
                     </html>
                 ";
 
-                var client = new ResendClient(apiKey);
-
                 var subject = string.IsNullOrEmpty(guestName)
                     ? "Nueva Confirmacion de Invitacion"
                     : $"Respuesta de Invitacion: {guestName}";
 
-                var message = new EmailMessage
-                {
-                    From = fromEmail,
-                    Subject = subject,
-                    HtmlBody = htmlBody
-                };
-                message.To.Add(toEmail);
-
-                _logger.LogInformation("Sending email via Resend...");
-                var response = await client.EmailSendAsync(message);
-
-                _logger.LogInformation("Resend response - Email sent with ID: {Id}", response?.Id);
-                _logger.LogInformation("Form confirmation email sent successfully to {ToEmail}", toEmail);
+                await SendEmailViaResendAsync(apiKey, fromEmail, toEmail, subject, htmlBody);
             }
             catch (Exception ex)
             {
                 _logger.LogWarning("Email not sent (Resend failed). Error: {Error}", ex.Message);
                 _logger.LogWarning("Stack trace: {Stack}", ex.StackTrace);
+            }
+        }
+
+        private async Task SendEmailViaResendAsync(string apiKey, string from, string to, string subject, string htmlBody)
+        {
+            _logger.LogInformation("Sending email via Resend API...");
+
+            var requestBody = new
+            {
+                from = from,
+                to = new[] { to },
+                subject = subject,
+                html = htmlBody
+            };
+
+            var json = JsonSerializer.Serialize(requestBody);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+
+            var response = await _httpClient.PostAsync("https://api.resend.com/emails", content);
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            _logger.LogInformation("Resend API Response Status: {Status}", response.StatusCode);
+            _logger.LogInformation("Resend API Response Body: {Body}", responseBody);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Email sent successfully to {ToEmail}", to);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to send email. Status: {Status}, Response: {Response}", response.StatusCode, responseBody);
             }
         }
     }
